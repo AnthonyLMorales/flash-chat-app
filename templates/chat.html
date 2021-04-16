@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+    <h1> Welcome to chat room</h1>
+    <div id="messages"></div>
+    <form id="message_input_form">
+        <input type="text" id="message_input" placeholder="Enter message">
+        <button type="button" id="btn">send</button>
+    </form>
+<div class="chat_box" id="chat_box">
+</div>
+
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    const socket = io.connect("http://127.0.0.1:5000");
+
+    $(document).ready(function (){
+        socket.on('connect',function (){
+        socket.emit('join_room',{
+            username: "{{ username }}",
+            room: "{{ room }}"
+            });
+        });
+
+        $("#btn").click(sendMessage);
+        function sendMessage() {
+            const element = document.getElementById("message_input").value;
+            if (element != '') {
+                socket.emit('send_message', {"message": element})
+            }
+            else {
+                console.log("sent ntohing");
+            }
+        }
+        socket.on('receive_message', function (data){
+            $("#chat_box").append('<h5>' + data['message']+ '<\h5>');
+        });
+    });
+
+
+
+    // socket.on('join_room_announcement',function (data){
+    //     console.log(data)
+    //     const newNode = document.createElement('div');
+    //     newNode.innerHTML = data.username + 'has joined the room';
+    //     document.getElementById('messages').appendChild(newNode);
+    // })
+    // let message_input = document.getElementById('message_input')
+    // document.getElementById('messages_input_form').onsubmit = function (e){
+    //     let message = message_input.value.trim();
+    //     e.preventDefault()
+    //     if(message.length){
+    //         socket.emit('send_message', {
+    //             username: "{{username}}",
+    //             room: "{{room}}",
+    //             message:message
+    //         })
+    //     }
+    //     message_input.value = '';
+    //     message_input.focus();
+    // }
+    // socket.on('receive_message',function(data){
+    //     const newNode = document.createElement('div');
+    //     newNode.innerHTML = data.username + " " + data.message;
+    //     document.getElementById('messages').appendChild(newNode);
+    // });
+</script>
+</html>
